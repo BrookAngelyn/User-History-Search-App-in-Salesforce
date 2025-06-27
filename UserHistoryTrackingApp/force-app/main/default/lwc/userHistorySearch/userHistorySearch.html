@@ -1,0 +1,156 @@
+<template>
+    <lightning-card title="User History Search" icon-name="standard:logging">
+        <!-- Search Filters -->
+        <div slot="actions">
+            <lightning-button 
+                label="Export Results" 
+                icon-name="utility:download" 
+                onclick={exportResults}
+                disabled={isExportDisabled}>
+            </lightning-button>
+        </div>
+        
+        <div class="slds-p-horizontal_medium">
+            <!-- Filter Section -->
+            <div class="slds-grid slds-wrap slds-gutters">
+                <!-- Target User Filter -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        name="targetUser"
+                        label="Whose Data to Search"
+                        placeholder="Select user..."
+                        options={userOptions}
+                        value={selectedTargetUser}
+                        onchange={handleTargetUserChange}>
+                    </lightning-combobox>
+                </div>
+                
+                <!-- Changed By User Filter -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        name="changedByUser"
+                        label="Who Changed the Data"
+                        placeholder="Select user..."
+                        options={userOptions}
+                        value={selectedChangedByUser}
+                        onchange={handleChangedByUserChange}>
+                    </lightning-combobox>
+                </div>
+                
+                <!-- Field Filter -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        name="fieldName"
+                        label="Field Changed"
+                        placeholder="Select field..."
+                        options={fieldOptions}
+                        value={selectedField}
+                        onchange={handleFieldChange}>
+                    </lightning-combobox>
+                </div>
+                
+                <!-- Start Date -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="date"
+                        name="startDate"
+                        label="Start Date"
+                        value={startDate}
+                        onchange={handleStartDateChange}>
+                    </lightning-input>
+                </div>
+                
+                <!-- End Date -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="date"
+                        name="endDate"
+                        label="End Date"
+                        value={endDate}
+                        onchange={handleEndDateChange}>
+                    </lightning-input>
+                </div>
+                
+                <!-- Limit -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-input
+                        type="number"
+                        name="recordLimit"
+                        label="Max Records"
+                        value={recordLimit}
+                        min="1"
+                        max="1000"
+                        onchange={handleLimitChange}>
+                    </lightning-input>
+                </div>
+            </div>
+            
+            <!-- Search Button -->
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    label="Search History"
+                    variant="brand"
+                    onclick={searchHistory}
+                    disabled={isSearching}>
+                </lightning-button>
+                
+                <lightning-button
+                    label="Clear Filters"
+                    variant="neutral"
+                    onclick={clearFilters}
+                    class="slds-m-left_small">
+                </lightning-button>
+            </div>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <template if:true={isSearching}>
+            <div class="slds-m-around_medium">
+                <lightning-spinner alternative-text="Searching..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+        
+        <!-- Results Summary -->
+        <template if:true={showResults}>
+            <div class="slds-m-around_medium">
+                <div class="slds-text-heading_small slds-m-bottom_small">
+                    Search Results ({searchResults.length} records found)
+                </div>
+                
+                <!-- Results Table -->
+                <lightning-datatable
+                    key-field="recordId"
+                    data={searchResults}
+                    columns={columns}
+                    hide-checkbox-column
+                    show-row-number-column
+                    resize-column-disabled
+                    sorted-by={sortedBy}
+                    sorted-direction={sortDirection}
+                    onsort={handleSort}>
+                </lightning-datatable>
+            </div>
+        </template>
+        
+        <!-- No Results Message -->
+        <template if:true={showNoResults}>
+            <div class="slds-m-around_medium">
+                <div class="slds-text-align_center slds-text-color_weak">
+                    <lightning-icon icon-name="utility:search" size="large"></lightning-icon>
+                    <div class="slds-m-top_small">No history records found matching your criteria.</div>
+                </div>
+            </div>
+        </template>
+        
+        <!-- Error Message -->
+        <template if:true={errorMessage}>
+            <div class="slds-m-around_medium">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error">
+                    <span class="slds-assistive-text">Error</span>
+                    <lightning-icon icon-name="utility:error" size="small" variant="inverse"></lightning-icon>
+                    <h2>{errorMessage}</h2>
+                </div>
+            </div>
+        </template>
+    </lightning-card>
+</template>
